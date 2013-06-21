@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <font8x8_basic.h>
 
 int main() {
 	int h = 640;
@@ -8,15 +9,16 @@ int main() {
 	printf("%d %d\n", h, w);	// height and width
 	printf("1\n");			// color depth
 
-	int s[8][8] = {
-			{0,0,1,1,0,0,0,0},
-			{0,1,1,1,1,0,0,0},
-			{1,1,0,0,1,1,0,0},
-                        {1,1,0,0,1,1,0,0},
-			{1,1,1,1,1,1,0,0},
-			{1,1,0,0,1,1,0,0},
-			{1,1,0,0,1,1,0,0},
-			{0,0,0,0,0,0,0,0}};
+	char *bitmap = font8x8_basic[65];
+
+	int s[8][8];
+	for (int x = 0; x < 8; x++) {
+		for (int y = 0; y < 8; y++) {
+			int set = bitmap[x] & 1 << y;
+			s[x][y] = set ? 1 : 0;
+		}
+	}
+
 
 	for (int k = 0; k < w; k++) {
 		for (int i = 0; i < h; i++) {
