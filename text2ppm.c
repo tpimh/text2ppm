@@ -25,19 +25,24 @@ void render (char str[]) {
 		}
 	}
 
-	int h = CHAR_H;
-	int w = CHAR_W * str_l;
+	int h = 480;
+	int w = 640;
 
+	// PPM specification: http://netpbm.sourceforge.net/doc/ppm.html
 	printf("P6\n");			// file format
 	printf("%d %d\n", w, h);	// width and height
-	printf("1\n");			// color depth
-
+	printf("1\n");			// maxval 
+	
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			if (s[y][x] == 1) {
-				printf("%c%c%c", 0, 0, 0);
-			} else {
+			if (x > sizeof(s[x]) / 4 - 1 || y > CHAR_H - 1) {
 				printf("%c%c%c", 1, 1, 1);
+			} else {
+				if (s[y][x] == 1) {
+					printf("%c%c%c", 0, 0, 0);
+				} else {
+					printf("%c%c%c", 1, 1, 1);
+				}
 			}
 		}
 	}
