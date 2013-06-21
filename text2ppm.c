@@ -6,8 +6,7 @@
 #define CHAR_W 8
 
 void usage (char *exec) {
-	printf("%s \"STRING\"", exec);
-	printf("\t\trender string as a PPM image\n");
+	fprintf(stderr, "Usage: %s \"STRING\"\n", exec);
 }
 
 void render (char str[]) {
