@@ -6,8 +6,8 @@
 #define CHAR_W	8
 #define SCR_H	480
 #define SCR_W	640
-#define ROWS	SCR_H / CHAR_H 
-#define COLS	SCR_W / CHAR_W
+#define ROWS	(SCR_H / CHAR_H) 
+#define COLS	(SCR_W / CHAR_W)
 
 void usage (char *exec) {
 	fprintf(stderr, "Usage: %s \"STRING\"\n", exec);
@@ -21,7 +21,7 @@ void render (char str[]) {
 	for (int i = 0; i < str_l; i++) {
 		char *bitmap = font8x8_basic[str[i]];
 
-		int row = i / 80;
+		int row = i / COLS;
 
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
