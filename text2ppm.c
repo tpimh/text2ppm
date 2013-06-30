@@ -2,8 +2,12 @@
 #include <string.h>
 #include <font8x8_basic.h>
 
-#define CHAR_H 8
-#define CHAR_W 8
+#define CHAR_H	8
+#define CHAR_W	8
+#define SCR_H	480
+#define SCR_W	640
+#define ROWS	SCR_H / CHAR_H 
+#define COLS	SCR_W / CHAR_W
 
 void usage (char *exec) {
 	fprintf(stderr, "Usage: %s \"STRING\"\n", exec);
@@ -12,37 +16,32 @@ void usage (char *exec) {
 void render (char str[]) {
 	int str_l = strlen(str);
 
-	int s[CHAR_H][CHAR_W * str_l];
+	int s[SCR_H][SCR_W];
 
 	for (int i = 0; i < str_l; i++) {
 		char *bitmap = font8x8_basic[str[i]];
 
+		int row = i / 80;
+
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				int set = bitmap[x] & 1 << y;
-				s[x][y + CHAR_W * i] = set ? 1 : 0;
+				s[x + CHAR_H * row][y + CHAR_W * (i - COLS * row)] = set ? 1 : 0;
 			}
 		}
 	}
 
-	int h = 480;
-	int w = 640;
-
 	// PPM specification: http://netpbm.sourceforge.net/doc/ppm.html
-	printf("P6\n");			// file format
-	printf("%d %d\n", w, h);	// width and height
-	printf("1\n");			// maxval 
+	printf("P6\n");				// file format
+	printf("%d %d\n", SCR_W, SCR_H);	// width and height
+	printf("1\n");				// maxval 
 	
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			if (x > sizeof(s[x]) / 4 - 1 || y > CHAR_H - 1) {
-				printf("%c%c%c", 1, 1, 1);
+	for (int y = 0; y < SCR_H; y++) {
+		for (int x = 0; x < SCR_W; x++) {
+			if (s[y][x] == 1) {
+				printf("%c%c%c", 0, 0, 0);
 			} else {
-				if (s[y][x] == 1) {
-					printf("%c%c%c", 0, 0, 0);
-				} else {
-					printf("%c%c%c", 1, 1, 1);
-				}
+				printf("%c%c%c", 1, 1, 1);
 			}
 		}
 	}
