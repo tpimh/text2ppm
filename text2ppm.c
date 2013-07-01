@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <font8x8_basic.h>
 
@@ -9,17 +10,58 @@
 #define ROWS	(SCR_H / CHAR_H) 
 #define COLS	(SCR_W / CHAR_W)
 
+#define SPACES_IN_A_TAB 4
+
 void usage (char *exec) {
 	fprintf(stderr, "Usage: %s \"STRING\"\n", exec);
 }
 
 void render (char str[]) {
-	int str_l = strlen(str);
+	size_t str_l = strlen(str);
 
 	int s[SCR_H][SCR_W];
 
 	for (int i = 0; i < str_l; i++) {
-		char *bitmap = font8x8_basic[str[i]];
+
+		unsigned char *bitmap = font[0];
+
+		if (str[i] >= 32 && str[i] <= 127) {
+			bitmap = font[(unsigned char)str[i]];
+		} else if (str[i] == '\t') {
+			char *tmp = malloc(str_l + SPACES_IN_A_TAB);
+
+			strncpy(tmp, str, i);
+			for (int j = 0; j < SPACES_IN_A_TAB; j++) {
+				strcpy(tmp + i + j, " ");
+			}
+			strncpy(tmp + i + SPACES_IN_A_TAB, str + i + 1, str_l - i);
+
+			strcpy(str, tmp);
+			free(tmp);
+			str_l = strlen(str);
+
+			bitmap = font[(unsigned char)str[i]];
+		} else if (str[i] == '\n') {
+			int spaces = COLS - (i - (i / COLS) * COLS);
+
+			char *tmp = malloc(str_l + spaces);
+
+			strncpy(tmp, str, i);
+			for (int j = 0; j < spaces; j++) {
+				strcpy(tmp + i + j, " ");
+			}
+			strncpy(tmp + i + spaces, str + i + 1, str_l - i);
+
+			strcpy(str, tmp);
+			free(tmp);
+			str_l = strlen(str);
+
+			bitmap = font[(unsigned char)str[i]];
+			
+		} else {
+			fprintf(stderr, "warn: unknown char (pos:%d, hex:%X), space used instead\n", i, str[i]);
+		}
+		fprintf(stderr, "info: char (pos:%d, hex:%X)\n", i, str[i]);
 
 		int row = i / COLS;
 
@@ -30,6 +72,8 @@ void render (char str[]) {
 			}
 		}
 	}
+
+	fprintf(stderr, "info: last (pos:%d, hex:%X)\n", str_l, str[str_l]);
 
 	// PPM specification: http://netpbm.sourceforge.net/doc/ppm.html
 	printf("P6\n");				// file format
