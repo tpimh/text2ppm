@@ -73,7 +73,7 @@ void render (char str[]) {
 		}
 	}
 
-	fprintf(stderr, "info: last (pos:%d, hex:%X)\n", str_l, str[str_l]);
+	fprintf(stderr, "info: last (pos:%d, hex:%X)\n", (int)str_l, str[str_l]);
 
 	// PPM specification: http://netpbm.sourceforge.net/doc/ppm.html
 	printf("P6\n");				// file format
