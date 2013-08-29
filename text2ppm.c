@@ -9,6 +9,7 @@
 #define SCR_W	640
 #define ROWS	(SCR_H / CHAR_H) 
 #define COLS	(SCR_W / CHAR_W)
+#define	TOTAL	(ROWS * COLS)
 
 #define SPACES_IN_A_TAB 4
 
@@ -22,7 +23,6 @@ void render (char str[]) {
 	int s[SCR_H][SCR_W];
 
 	for (int i = 0; i < str_l; i++) {
-
 		unsigned char *bitmap = font[0];
 
 		if (str[i] >= 32 && str[i] <= 127) {
@@ -61,16 +61,23 @@ void render (char str[]) {
 		} else {
 			fprintf(stderr, "warn: unknown char (pos:%d, hex:%X), space used instead\n", i, str[i]);
 		}
-		fprintf(stderr, "info: char (pos:%d, hex:%X)\n", i, str[i]);
 
-		int row = i / COLS;
+		if (i < TOTAL) {
+			fprintf(stderr, "info: char '%c' (pos:%d, hex:%X)\n", str[i], i, str[i]);
 
-		for (int x = 0; x < 8; x++) {
-			for (int y = 0; y < 8; y++) {
-				int set = bitmap[x] & 1 << y;
-				s[x + CHAR_H * row][y + CHAR_W * (i - COLS * row)] = set ? 1 : 0;
+			int row = i / COLS;
+
+			for (int x = 0; x < 8; x++) {
+				for (int y = 0; y < 8; y++) {
+					int set = bitmap[x] & 1 << y;
+					s[x + CHAR_H * row][y + CHAR_W * (i - COLS * row)] = set ? 1 : 0;
+				}
 			}
 		}
+	}
+
+	if ((int)str_l > TOTAL) {
+		fprintf(stderr, "warn: %d ending chars omitted\n", (int)str_l - TOTAL);
 	}
 
 	fprintf(stderr, "info: last (pos:%d, hex:%X)\n", (int)str_l, str[str_l]);
